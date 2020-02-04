@@ -88,17 +88,24 @@ public class ControlFrame extends JFrame {
         btnPauseAndCheck.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                /*
-				 * COMPLETAR
-                 */
-                int sum = 0;
-                for (Immortal im : immortals) {
-                    sum += im.getHealth();
+            	 int sum = 0;
+                 for (Immortal im : immortals) {
+                     sum += im.getHealth();
+                 } 
+                 
+                 
+            	synchronized(immortals) {
+            		for (Immortal im : immortals) {
+	                    im.pausar=true;
+	                    immortals.notifyAll();
+            		}    
                 }
-
+            	
                 statisticsLabel.setText("<html>"+immortals.toString()+"<br>Health sum:"+ sum);
-                
-                
+
+               
+            	
+                 
 
             }
         });
@@ -108,9 +115,16 @@ public class ControlFrame extends JFrame {
 
         btnResume.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                /**
-                 * IMPLEMENTAR
-                 */
+            	synchronized(immortals) {
+            		
+            		 for (Immortal im : immortals) {
+
+                         im.pausar=false;
+                         immortals.notifyAll();
+                     }
+                     
+            		
+            	}
 
             }
         });
@@ -141,7 +155,7 @@ public class ControlFrame extends JFrame {
         contentPane.add(statisticsLabel, BorderLayout.SOUTH);
 
     }
-
+ 
     public List<Immortal> setupInmortals() {
 
         ImmortalUpdateReportCallback ucb=new TextAreaUpdateReportCallback(output,scrollPane);
