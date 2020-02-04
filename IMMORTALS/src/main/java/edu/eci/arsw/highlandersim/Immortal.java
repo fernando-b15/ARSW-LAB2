@@ -35,7 +35,7 @@ public class Immortal extends Thread {
 
     public void run() {
 
-        while (true) {
+        while (health.get()>0) {
 	        	synchronized (immortalsPopulation) {
 	                while (pausar) {
 	                    try {
@@ -48,29 +48,26 @@ public class Immortal extends Thread {
 	            }
 
 	            Immortal im;
-	
-	            int myIndex = immortalsPopulation.indexOf(this);
-	
-	            int nextFighterIndex = r.nextInt(immortalsPopulation.size());
-	
-	            //avoid self-fight
-	            if (nextFighterIndex == myIndex) {
-	                nextFighterIndex = ((nextFighterIndex + 1) % immortalsPopulation.size());
-	            }
-	
-	            im = immortalsPopulation.get(nextFighterIndex);
-	
-	            this.fight(im);
-	
-	            try {
-	                Thread.sleep(1);
-	            } catch (InterruptedException e) {
-	                e.printStackTrace();
-	            }
-        	}
 
-        
-
+            synchronized (immortalsPopulation) {
+                int myIndex = immortalsPopulation.indexOf(this);
+                int nextFighterIndex = r.nextInt(immortalsPopulation.size());
+                // avoid self-fight
+                if (nextFighterIndex == myIndex) {
+                    nextFighterIndex = ((nextFighterIndex + 1) % immortalsPopulation.size());
+                }
+                im = immortalsPopulation.get(nextFighterIndex);
+                if (im.getHealth() == 0) {
+                    continue;
+                }
+                this.fight(im);
+            }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public synchronized void fight(Immortal i2) {
